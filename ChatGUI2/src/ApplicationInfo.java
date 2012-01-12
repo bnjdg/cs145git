@@ -13,7 +13,7 @@ public class ApplicationInfo{
 		this.port = null;
 		this.hash = null;
 		this.role = null;
-
+		
 	}
 
 	public ApplicationInfo(String username, String hash, String ipaddress, String port){

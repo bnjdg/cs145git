@@ -13,27 +13,26 @@ public class ServerSideThread extends Thread {
 	ApplicationInfo server;
 	ApplicationInfo client;
 	ChatGUI srvGUI;
-
+	
 	public ServerSideThread(Socket clientConnection, ApplicationInfo server){
 		this.clientConnection = clientConnection;
 		this.server = server;
 		client = new ApplicationInfo();
 	}
-
+		
 	public void run() {
 		try {
 			init();
 			setupStreams();
 			handshake();
 			threads();		
-			close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 	}
-
+	
 	public void init(){
 		String srvhash;
 		String srvip;
@@ -45,7 +44,7 @@ public class ServerSideThread extends Thread {
 		server.setIpAdd(srvip);
 		server.setPort(""+srvport);
 	}
-
+	
 	public void setupStreams() throws Exception{
 		System.out.print("Server: Setting up streams...");
 		outgoing = new DataOutputStream(clientConnection.getOutputStream());
@@ -54,7 +53,10 @@ public class ServerSideThread extends Thread {
 	}
 
 	public void close() throws Exception{
-		clientConnection.close();
+		if (!(clientConnection.isClosed())){
+			clientConnection.close();
+			System.out.println("Client: "+ client.getUsername() +" disconnected.");
+			}
 	}
 
 	public void handshake(){
@@ -88,7 +90,7 @@ public class ServerSideThread extends Thread {
 				client.setPort(clntport.substring(5));
 			}
 			outgoing.writeBytes("port:"+server.getPort()+"\n");
-
+						
 			System.out.println("Handshake ok");
 		} catch(Exception e){
 			System.out.println("Handshake failed error: " + e);
@@ -121,48 +123,83 @@ public class ServerSideThread extends Thread {
 		}
 		return null;
 	}
+	
+	public void formWindowClosing(java.awt.event.WindowEvent evt) throws Exception {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+		close();
+    }//GEN-LAST:event_formWindowClosing
 
 	public void threads(){
 		srvGUI = new ChatGUI(this.outgoing, "Server", server, client);
+		srvGUI.setTitle("Chat: "+server.getUsername()+" - "+client.getUsername());
 		srvGUI.runGUI();
-		
+		srvGUI.addWindowListener(new java.awt.event.WindowAdapter() {
+	            public void windowClosing(java.awt.event.WindowEvent evt) {
+	                try {
+						formWindowClosing(evt);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	            }
+	        });
 		while(true){
 			try{
+				if(clientConnection.isClosed()){
+					srvGUI.dispose();
+					break;
+				}
+				if (incoming == null){
+					srvGUI.dispose();
+					break;
+				}
+				else{
 				String msg = incoming.readLine();
 				if (msg == null){
+					srvGUI.setTitle("Chat: "+server.getUsername()+" - "+client.getUsername());
+					srvGUI.repaint();
 					srvGUI.getTxtArea().append("Disconnecting..OK\n");
 					srvGUI.getTxtArea().repaint();
 					srvGUI.dispose();
+					close();
 					break;
 				}
 				srvGUI.getTxtArea().append("\r");
 				if (msg.startsWith("disconnect:") || msg.endsWith("KThanksBye!")){
-					srvGUI.getTxtArea().append(client.getUsername()+": "+ msg.substring(11)+"\n");
-					srvGUI.getTxtArea().repaint();
+					srvGUI.setTitle("Chat: "+server.getUsername()+" - "+client.getUsername());
+					srvGUI.repaint();
+						srvGUI.getTxtArea().append(client.getUsername()+": "+ msg.substring(11)+"\n");
+						srvGUI.getTxtArea().repaint();
 					srvGUI.getTxtArea().append("Disconnecting..OK\n");
 					srvGUI.getTxtArea().repaint();
 					srvGUI.dispose();
+					close();
 					break;
 				}
 				if (msg.startsWith("message:")){
-					srvGUI.getTxtArea().append(client.getUsername()+": " + msg.substring(8)+"\n");
-					srvGUI.getTxtArea().repaint();
-
+						srvGUI.setTitle("Chat: "+server.getUsername()+" - "+client.getUsername());
+						srvGUI.repaint();
+						srvGUI.getTxtArea().append(client.getUsername()+": " + msg.substring(8)+"\n");
+						srvGUI.getTxtArea().repaint();
+								
 				}
 				if (msg.startsWith("cusername:")||msg.startsWith("cusername:@")){
 					System.out.print("\r");
-					srvGUI.getTxtArea().append(client.getUsername() + " has changed his\\her username to ");
-					client.setUsername(msg.substring(11));
-					srvGUI.getTxtArea().append(client.getUsername() +"\n");
-					srvGUI.getTxtArea().repaint();
-
+						srvGUI.getTxtArea().append(client.getUsername() + " has changed his\\her username to ");
+						client.setUsername(msg.substring(11));
+						srvGUI.getTxtArea().append(client.getUsername() +"\n");
+						srvGUI.getTxtArea().repaint();
+						srvGUI.setTitle("Chat: "+server.getUsername()+" - "+client.getUsername());
+						srvGUI.repaint();
+				}
 				}
 			} catch(Exception e){
-				e.printStackTrace();
+				//System.err.println("error reading: " + e);
+				break;
 			}
-
+			
 		}
 
 	}
-
+	
 }

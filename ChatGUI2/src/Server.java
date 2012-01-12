@@ -35,7 +35,6 @@ public class Server {
 		s.start(50000);
 		s.listen();
 		s.close();
-		System.exit(0);
 	}	
 
 	public void start(int port) throws Exception{
@@ -59,7 +58,7 @@ public class Server {
 		serverConnection.close();
 		System.out.print("closed!\n");
 	}
-
+	
 
 
 }

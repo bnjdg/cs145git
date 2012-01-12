@@ -1,0 +1,16 @@
+
+Server==> ServerSideThread(clientConnection) ==> GUI()
+											 ==> ReadThread(chatGUI, clientConnection);
+											 ==> WriteThread(chatGUI, clientConnection);
+	  --> Server listen()
+	  	while(true){
+	  		System.out.println("Waiting for incoming connections.");
+	  		clientConnection = serverConnection.accept();
+	  		Thread srvthread = new ServerSideThread(clientConnection);
+	  		srvthread.start();
+	  	}
+	  	
+
+GUI ==> ReadThread --> GUI.getChatTxtArea.append(message); GUI.getChatTxtArea.repaint();
+	==> WriteThread --> WriteThread.send(message);ChatTxtArea.append(applicationinfo.getUsername()+""+message);
+	

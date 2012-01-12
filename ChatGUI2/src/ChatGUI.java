@@ -14,12 +14,12 @@ public class ChatGUI extends JFrame{
 	public JLabel ConvoLabel;
 	public JTextField MsgTextField;
 	public JButton SendButton;
-
+	
 	DataOutputStream outgoing;
 	ApplicationInfo server;
 	ApplicationInfo client;
 	String clntorsrvr;
-
+	
 	public ChatGUI(DataOutputStream os ,String clntorsrvr, ApplicationInfo server, ApplicationInfo client){
 		this.outgoing = os;
 		this.clntorsrvr = clntorsrvr;
@@ -31,8 +31,8 @@ public class ChatGUI extends JFrame{
 	public ChatGUI(){
 		initComponents();
 	}
-
-
+	
+	
 
 	private void initComponents() {
 
@@ -45,7 +45,13 @@ public class ChatGUI extends JFrame{
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle(clntorsrvr + " Conversation Window");
 		setName("ChatGUI"); // NOI18N
-
+		addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                formFocusGained(evt);
+            }
+        });
+		
+		
 		SendButton.setText("Send");
 		SendButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -58,6 +64,11 @@ public class ChatGUI extends JFrame{
 		MsgTextField.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
 		MsgTextField.setText("(type message here)");
 		MsgTextField.setDragEnabled(true);
+		MsgTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                MsgTextFieldFocusGained(evt);
+            }
+        });
 		MsgTextField.addKeyListener(new  KeyAdapter() {
 			public void keyPressed( KeyEvent evt) {
 				MsgTextFieldKeyPressed(evt);
@@ -114,14 +125,24 @@ public class ChatGUI extends JFrame{
 			MsgTextField.repaint();
 		}
 		else{
-
-
+			
+			
 		}
+		
+		
+	}   
+	private void formFocusGained(java.awt.event.FocusEvent evt) {
+	        // TODO add your handling code here:
+	        MsgTextField.grabFocus();
+	    }
 
+	private void MsgTextFieldFocusGained(java.awt.event.FocusEvent evt) {
+        // TODO add your handling code here:
+        MsgTextField.setText(null);
+        MsgTextField.repaint();
+    }
 
-	}                                       
-
-
+	
 	private void SendButtonActionPerformed(ActionEvent evt) {                                           
 		// TODO add your handling code here:
 		//writethread.sendMsg();
@@ -135,7 +156,6 @@ public class ChatGUI extends JFrame{
 	public void sendMsg(String msg2){
 		String msg = msg2;
 		try{ 
-
 			this.getTxtArea().append("\r");
 			if (msg.endsWith("KThanksBye!")){
 				outgoing.writeBytes("disconnect:"+msg+"\n");
@@ -148,7 +168,7 @@ public class ChatGUI extends JFrame{
 					client.setUsername(msg.substring(1));
 					this.getTxtArea().append("You have change your name into " + client.getUsername() + "\n");
 					this.getTxtArea().repaint();
-
+					
 				}else {
 					server.setUsername(msg.substring(1));
 					this.getTxtArea().append("You have change your name into " + server.getUsername() + "\n");
@@ -164,16 +184,16 @@ public class ChatGUI extends JFrame{
 					this.getTxtArea().repaint();
 				}
 			}
-
+	
 		}catch (Exception e){
 			System.err.println("Error reading input: "+ e);
 			return;
 		}
 	}
-
+	
 	public void runGUI() {
 
-		/*		try {
+/*		try {
 			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
 					UIManager.setLookAndFeel(info.getClassName());
@@ -189,7 +209,7 @@ public class ChatGUI extends JFrame{
 		} catch (UnsupportedLookAndFeelException ex) {
 			java.util.logging.Logger.getLogger(ChatGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 		}
-		 */
+*/
 		EventQueue.invokeLater(new Runnable() {
 
 			public void run() {
