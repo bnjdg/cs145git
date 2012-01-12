@@ -1,0 +1,59 @@
+java Server <username>
+java Client <remoteip> <username>
+
+genMd5hash			
+send hash			hash:<hash>\n
+respond hash			hash:<hash>\n
+send username			username:<username>\n
+	print "You are now talking to " + <username>
+respond username		username:<username>\n
+	print "You are now talking to " + <username>
+send ipaddress			ip:<ipaddress>
+	print <username>'s ip address
+respond ipaddress		ip:<ipaddress>
+	print <username>'s ip address
+send port			port:<port>
+	print <username>'s port: <port>
+respond port			port:<port>
+	print <username>'s Port: <port>
+handshake ok
+
+message:________________\n
+
+must display after receive:
+<username>:message
+
+
+disconnect:<message> KThanksbye!
+
+Md5Demo.java
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+
+public class Md5Demo{
+	public static void main(String args[]) throws Exception{
+	Md5Demo demo = new Md5Demo();
+	SecureRandom random = new SecureRandom();
+	String plaintext = new BigInteger(130, random).toString(32);
+	System.out.println("Md5("+plaintext+")=");
+	//codefromtheinternet
+	MessageDigest m = MessageDigest.getInstance("MD5");
+	m.reset();
+	m.update(plaintext.getBytes());
+	byte[] digest = m.digest();
+	BigInteger bigInt = new BigInteger(1, digest);
+	String hashtext = bigInt.toString(16);
+	//pad 0s to achieve 32 chars
+	while(hashtext.length()<32){
+		hashtext = "0" + hashtext;
+	}
+	System.out.println(hashtext);
+	}
+
+
+clientConnection.getPort();
+clientConnection.getInedAddress().getHost;
+clientConnection.getLocalPort();
+clientConnection.getLocalAddress();

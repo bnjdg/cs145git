@@ -1,0 +1,66 @@
+import java.io.DataOutputStream;
+import java.util.Scanner;
+/**
+ *
+ * @author Benj
+ */
+public class WriteThread extends Thread{
+    String clntorsrvr;
+    DataOutputStream outgoing;
+    Socket socket;
+       public WriteThread(DataOutputStream os ,String clntorsrvr, Socket socket){
+	 this.socket = socket;
+         this.outgoing = os;
+         this.clntorsrvr = clntorsrvr;
+       }
+       
+       @Override
+       public void run(){
+        String msg;
+		Scanner sc = new Scanner(System.in);
+		while (true){
+			if(clntorsrvr.equals("Client")){
+			System.out.print("Client: ");}
+				else 
+				System.out.print("Server: ");
+			try{
+				msg = sc.nextLine();
+			
+				if (msg == null){
+					System.out.print("closing...");
+					socket.close();
+					System.out.print("closed!\n");
+					System.exit(0);
+					break;
+				}
+				System.out.print("\r");
+			//	System.out.println("Client: "+ msg);
+				outgoing.writeBytes(msg+"\n");	
+				if (msg.equals("KThanksBye!")){
+					System.out.print("closing...");
+					socket.close();
+					System.out.print("closed!\n");
+					System.exit(0);
+				
+				}
+				if (msg==null){
+					System.out.print("closing...");
+					socket.close();
+					System.out.print("closed!\n");
+					System.exit(0);
+					
+				}
+			}catch (Exception e){
+				System.err.println("Error reading input: "+ e);
+				this.interrupt();
+				break;
+			}
+		}
+      
+	  
+	  }
+    
+    
+    
+}
+

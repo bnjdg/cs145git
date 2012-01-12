@@ -1,0 +1,61 @@
+import java.io.BufferedReader;
+
+/**
+ *
+ * @author Benj
+ */
+public class ReadThread extends Thread{
+   BufferedReader instrm; 
+   String clntorsrvr;
+   Socket socket; 
+
+	public ReadThread(BufferedReader instream, String clntorsrvr, Socket socket){
+	        this.instrm = instream;
+		this.clntorsrvr = clntorsrvr;
+		this.socket = socket;
+    }
+    
+    @Override
+    public void run(){
+	String msg;
+		while(true){
+			
+			try{
+				msg = instrm.readLine();
+				
+				if (msg == null){
+					System.out.print("closing...");
+					socket.close();
+					System.out.print("closed!\n");
+					System.exit(0);
+					break;
+				}
+				System.out.print("\r");
+				if(clntorsrvr.equals("Client")){
+					System.out.print("Server: ");}
+				else{
+					System.out.print("Client: ");
+				}
+				System.out.print(msg + "\n" );  
+				if(clntorsrvr.equals("Client")){
+					System.out.print("Client: ");}
+				else {
+					System.out.print("Server: ");
+				}
+				if (msg.equals("KThanksBye!")){
+					System.out.print("closing...");
+					socket.close();
+					System.out.print("closed!\n");
+					System.exit(0);
+					break;
+				}
+			} catch(Exception e){
+				System.err.println("error reading: " + e);
+				this.interrupt();
+				break;
+			}
+			
+        }
+    }
+    
+}
